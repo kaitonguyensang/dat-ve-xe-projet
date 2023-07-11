@@ -12,6 +12,7 @@ import com.example.datvexe.payloads.dto.ForgetPasswordDto;
 import com.example.datvexe.payloads.requests.ForgetPasswordForm;
 import com.example.datvexe.payloads.requests.RequestForgetPasswordForm;
 import com.example.datvexe.payloads.responses.DataResponse;
+import com.example.datvexe.repositories.UserRepository;
 import com.example.datvexe.utils.AESUtils;
 import com.example.datvexe.utils.ConvertUtils;
 import com.example.datvexe.utils.GoogleUtils;
@@ -44,6 +45,8 @@ import static com.example.datvexe.constants.Constants.*;
 @CrossOrigin(origins = "http://localhost:3000")
 public class LoginController {
 
+    private static final long serialVersionUID = 1L;
+
     @Autowired
     PasswordEncoder passwordEncoder;
 
@@ -60,22 +63,31 @@ public class LoginController {
     TaiKhoanRepository taiKhoanRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     private GoogleUtils googleUtils;
 
     @GetMapping("/login-google")
     public DataResponse loginGoogle(HttpServletRequest request) throws ClientProtocolException, IOException {
         String code = request.getParameter("code");
-        System.out.println(code);
 
         if (code == null || code.isEmpty()) {
             return new DataResponse("404", NOT_FOUND);
         }
+
         String accessToken = googleUtils.getToken(code);
 
         GooglePojo googlePojo = googleUtils.getUserInfo(accessToken);
         CustomTaiKhoanDetails userDetail = googleUtils.buildUser(googlePojo);
         if (userDetail == null) {
             return new DataResponse("400", EXIST_EMAIL);
+        }
+        TaiKhoan taiKhoan = taiKhoanRepository.findTaiKhoanByUser_Email(googlePojo.getEmail());
+        Long id = userRepository.findUserByEmail(googlePojo.getEmail()).getId();
+        LoginResponse loginResponse = new LoginResponse(null, Role.USER, id, taiKhoan.getUsername(), googlePojo.getEmail());
+        if (!userDetail.isEnabled()) {
+            return new DataResponse("201", loginResponse);
         }
         // Xác thực từ username và password.
         Authentication authentication = authenticationManager.authenticate(
@@ -89,28 +101,10 @@ public class LoginController {
         // Set thông tin authentication vào Security Context
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        Long id = 0L;
-        String email;
-        TaiKhoan taiKhoan = taiKhoanRepository.findTaiKhoanByAdmin_Email(googlePojo.getEmail());
-       if (taiKhoan.getRole() == Role.NHAXE) {
-            id = taiKhoan.getNhaXe().getId();
-            email = taiKhoan.getNhaXe().getEmail();
-        }
-        else  if (taiKhoan.getRole() == Role.ADMIN) {
-            id = taiKhoan.getAdmin().getId();
-            email = taiKhoan.getAdmin().getEmail();
-        } else {
-            id = taiKhoan.getUser().getId();
-            email = taiKhoan.getUser().getEmail();
-        }
         // Trả về jwt cho người dùng.
         String jwt = tokenProvider.generateToken((CustomTaiKhoanDetails) authentication.getPrincipal());
-        LoginResponse loginResponse = new LoginResponse(jwt, Role.USER, id, taiKhoan.getUsername(), email);
-        if (googlePojo.isVerified_email()) {
-            return new DataResponse("200", loginResponse);
-        } else {
-            return new DataResponse("201", loginResponse);
-        }
+        loginResponse = new LoginResponse(jwt, Role.USER, id, taiKhoan.getUsername(), googlePojo.getEmail());
+        return new DataResponse("200", loginResponse);
     }
 
     @PostMapping("/login")

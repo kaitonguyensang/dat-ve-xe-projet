@@ -52,6 +52,7 @@ public class SignUpServiceImpl implements SignUpService {
         user.setEmail(signUpRequest.getEmail());
         user.setDiaChi(signUpRequest.getDiaChi());
         user.setTaiKhoan(taiKhoan);
+        user.setPicture(signUpRequest.getPicture());
         return user;
     }
 
@@ -63,6 +64,7 @@ public class SignUpServiceImpl implements SignUpService {
         nhaXe.setEmail(signUpRequest.getEmail());
         nhaXe.setDiaChi(signUpRequest.getDiaChi());
         nhaXe.setTaiKhoan(taiKhoan);
+        nhaXe.setPicture(signUpRequest.getPicture());
         return nhaXe;
     }
 

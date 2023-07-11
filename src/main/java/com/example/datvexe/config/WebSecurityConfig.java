@@ -70,16 +70,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/vexe/tuyenxe-id/**").permitAll()
                 .antMatchers("/api/thongke/nguoidung/**").permitAll()// Cho phép tất cả mọi người truy cập vào địa chỉ này
                 .anyRequest().authenticated(); // Tất cả các request khác đều cần phải xác thực mới được truy cập
-        // Cấu hình cho Login Form.
-        http.authorizeRequests().and().formLogin()//
-                .loginProcessingUrl("/j_spring_security_login")//
-                .loginPage("/login")//
-                .defaultSuccessUrl("/user")//
-                .failureUrl("/login?message=error")//
-                .usernameParameter("username")//
-                .passwordParameter("password")
-                // Cấu hình cho Logout Page.
-                .and().logout().logoutUrl("/j_spring_security_logout").logoutSuccessUrl("/login?message=logout");
 
         // Thêm một lớp Filter kiểm tra jwt
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

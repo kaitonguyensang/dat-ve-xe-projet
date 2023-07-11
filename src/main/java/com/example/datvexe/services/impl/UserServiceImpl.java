@@ -43,6 +43,7 @@ public class UserServiceImpl implements UserService {
         user.setEmail(userRequest.getEmail());
         user.setDiaChi(userRequest.getDiaChi());
         user.setTaiKhoan(taiKhoan);
+        user.setPicture(userRequest.getPicture());
         return user;
     }
 

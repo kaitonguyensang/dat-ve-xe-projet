@@ -1,4 +1,5 @@
 package com.example.datvexe.models;
+import com.example.datvexe.common.HinhThucThanhToan;
 import com.example.datvexe.common.TrangThai;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -38,6 +39,10 @@ public class HangHoa {
     @Column(name = "trangthai")
     @Enumerated(EnumType.STRING)
     private TrangThai trangThai;
+
+    @Column(name = "hinhthucthanhtoan")
+    @Enumerated(EnumType.STRING)
+    private HinhThucThanhToan hinhThucThanhToan;
 
     @ManyToOne
     @JoinColumn(name = "tuyenxe_id",referencedColumnName = "id")

@@ -15,6 +15,14 @@ public class Constants {
     public static final String NOT_FOUND = "Not found.";
     public static final String MISS_FIELD = "Missing field";
 
+    public static final String PASS_GOOGLE_ACCOUNT = "Kaitooo";
+
+    public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+    public static String vnp_Returnurl = "https://cms-admin-management-project.vercel.app/";
+    public static String vnp_TmnCode = "X50IF3JA";
+    public static String vnp_HashSecret = "GKDRVXISPGPDFMMCGYQSSSHPNMZZVTSJ";
+    public static String vnp_apiUrl="https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+
     private Constants(){
         throw new IllegalStateException("Utility class");
     }

@@ -35,6 +35,9 @@ public class User {
     @Column(name = "diachi")
     private String diaChi;
 
+    @Column(name = "picture")
+    private String picture;
+
     @OneToOne
     @JoinColumn(name = "taikhoan_id",referencedColumnName = "id")
     @JsonManagedReference

@@ -34,6 +34,7 @@ public class HangHoaServiceImpl implements HangHoaService {
         hangHoa.setTenNguoNhan(hangHoaRequest.getTenNguoiNhan());
         hangHoa.setSdtNguoiNhan(hangHoaRequest.getSdtNguoiNhan());
         hangHoa.setEmail(hangHoaRequest.getEmail());
+        hangHoa.setHinhThucThanhToan(hangHoaRequest.getHinhThucThanhToan());
         if (tuyenXeRepository.findOneById(hangHoaRequest.getTuyenXeId())==null) return new DataResponse("1","/");
         hangHoa.setTuyenXe(tuyenXeRepository.findOneById(hangHoaRequest.getTuyenXeId()));
         if (userRepository.findUserById(hangHoaRequest.getUserId())==null) return new DataResponse("2","/");

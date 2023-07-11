@@ -39,6 +39,9 @@ public class NhaXe {
     @Column(name = "ngayhethan")
     private LocalDate ngayHetHan;
 
+    @Column(name = "picture")
+    private String picture;
+
     @OneToOne
     @JoinColumn(name = "taikhoan_id",referencedColumnName = "id")
     @JsonManagedReference

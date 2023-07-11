@@ -1,5 +1,6 @@
 package com.example.datvexe.payloads.requests;
 
+import com.example.datvexe.common.HinhThucThanhToan;
 import com.example.datvexe.common.TrangThai;
 import lombok.Data;
 import lombok.Getter;
@@ -19,5 +20,6 @@ public class HangHoaRequest {
     private LocalDate ngayDat;
     private Long tuyenXeId;
     private Long userId;
+    private HinhThucThanhToan hinhThucThanhToan;
     private TrangThai trangThai;
 }

@@ -18,6 +18,7 @@ public class UserRequest {
     private String sdt;
     private String email;
     private String diaChi;
+    private String picture;
     @Enumerated(EnumType.STRING)
     private TrangThai trangThaiHoatDong;
     @Enumerated(EnumType.STRING)

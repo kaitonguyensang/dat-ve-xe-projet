@@ -42,7 +42,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public DataResponse updateAdmin(@PathVariable("id") String id,@RequestBody UserRequest userRequest){
+    public DataResponse updateUser(@PathVariable("id") String id,@RequestBody UserRequest userRequest){
         if (userRequest == null || id == null) throw new CustomException("400", "Missing field!!!");
         Long userId = Long.valueOf(id);
         DataResponse dataResponse = userService.updateUser(userRequest,userId);

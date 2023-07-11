@@ -18,6 +18,7 @@ public class NhaXeRequest {
     private String moTaNgan;
     private String diaChi;
     private String email;
+    private String picture;
     @Enumerated(EnumType.STRING)
     private TrangThai trangThaiHoatDong;
     @Enumerated(EnumType.STRING)

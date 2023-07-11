@@ -48,6 +48,7 @@ public class NhaXeServiceImpl implements NhaXeService {
         nhaXe.setMoTaNgan(nhaXeRequest.getMoTaNgan());
         nhaXe.setDiaChi(nhaXeRequest.getDiaChi());
         nhaXe.setTaiKhoan(taiKhoan);
+        nhaXe.setPicture(nhaXeRequest.getPicture());
         return nhaXe;
     }
 

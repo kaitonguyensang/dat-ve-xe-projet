@@ -54,7 +54,7 @@ public class VeXeController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('NHAXE')")
+    @PreAuthorize("hasAnyRole('NHAXE', 'USER')")
     public DataResponse updateVeXe(@PathVariable("id") String id,@RequestBody VeXeRequest veXeRequest){
         if(veXeRequest == null || id==null)  throw  new CustomException("400","Missing field!!!");
         Long veXeId = Long.valueOf(id);
