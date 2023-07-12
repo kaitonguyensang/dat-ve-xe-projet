@@ -42,7 +42,7 @@ import static com.example.datvexe.constants.Constants.*;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://duyvotruong.github.io"})
 public class LoginController {
 
     private static final long serialVersionUID = 1L;

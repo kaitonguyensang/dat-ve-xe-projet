@@ -15,7 +15,7 @@ import java.util.List;
 import static com.example.datvexe.constants.Constants.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://duyvotruong.github.io"})
 @RequestMapping("api/danhgia")
 public class DanhGiaController {
 

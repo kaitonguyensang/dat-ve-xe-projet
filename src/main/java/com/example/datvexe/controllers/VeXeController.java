@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://duyvotruong.github.io"})
 @RequestMapping("/api/vexe")
 public class VeXeController {
 
@@ -30,7 +30,7 @@ public class VeXeController {
     }
 
     @GetMapping("/tuyenxe-id/{id}")
-    @PreAuthorize("hasAnyRole('NHAXE','ADMIN')")
+    @PreAuthorize("hasAnyRole('NHAXE','ADMIN','USER')")
     public DataResponse getAllVexXeByTuyenXeId(@PathVariable("id") String id){
         if(id == null) throw new CustomException("400","Missing field!!!!");
         Long tuyenXeId = Long.valueOf(id);

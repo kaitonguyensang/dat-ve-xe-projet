@@ -20,7 +20,7 @@ import java.util.List;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://duyvotruong.github.io"})
 @RequestMapping("/api/tuyenxe")
 public class TuyenXeController {
     @Autowired
