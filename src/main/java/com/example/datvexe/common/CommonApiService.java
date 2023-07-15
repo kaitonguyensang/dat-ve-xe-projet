@@ -17,6 +17,10 @@ public class CommonApiService {
         return OTPService.generate(6);
     }
 
+    public String getOTPVerifyEmail(){
+        return OTPService.generate(6);
+    }
+
     public String getOTPValidateEmail(){
         return OTPService.generate(6);
     }

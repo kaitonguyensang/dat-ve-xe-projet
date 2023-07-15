@@ -40,6 +40,7 @@ public class SignUpServiceImpl implements SignUpService {
         taiKhoan.setPassword(signUpRequest.getPassword());
         taiKhoan.setRole(signUpRequest.getRole());
         taiKhoan.setTrangThaiHoatDong(TrangThai.ACTIVE);
+        taiKhoan.setVerifyEmail(false);
         if (signUpRequest.getRole() == Role.NHAXE) taiKhoan.setTrangThaiHoatDong(TrangThai.INACTIVE);
         return taiKhoan;
     }

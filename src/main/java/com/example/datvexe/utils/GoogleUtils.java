@@ -8,8 +8,7 @@ import com.example.datvexe.common.Role;
 import com.example.datvexe.common.TrangThai;
 import com.example.datvexe.config.CustomTaiKhoanDetails;
 import com.example.datvexe.models.TaiKhoan;
-import com.example.datvexe.payloads.requests.SignUpRequest;
-import com.example.datvexe.repositories.NhaXeRepository;
+import com.example.datvexe.models.User;
 import com.example.datvexe.repositories.TaiKhoanRepository;
 import com.example.datvexe.repositories.UserRepository;
 import com.example.datvexe.services.SignUpService;
@@ -18,6 +17,7 @@ import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +29,9 @@ import static com.example.datvexe.constants.Constants.PASS_GOOGLE_ACCOUNT;
 @Component
 @Service
 public class GoogleUtils {
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     SignUpService signUpService;
@@ -68,24 +71,24 @@ public class GoogleUtils {
                 || taiKhoanRepository.findTaiKhoanByAdmin_Email(googlePojo.getEmail()) != null) {
             return null;
         } else if (taiKhoanRepository.findTaiKhoanByUser_Email(googlePojo.getEmail()) == null) {
-            SignUpRequest signUpRequest = new SignUpRequest();
-            signUpRequest.setEmail(googlePojo.getEmail());
-            signUpRequest.setUsername(googlePojo.getEmail());
-            signUpRequest.setHoTen(googlePojo.getName());
-            signUpRequest.setUsername(googlePojo.getEmail());
-            signUpRequest.setPassword(PASS_GOOGLE_ACCOUNT);
-            signUpRequest.setRole(Role.USER);
-            signUpRequest.setTrangThaiHoatDong(TrangThai.ACTIVE);
-            signUpRequest.setPicture(googlePojo.getPicture());
-            signUpService.addTaiKhoanUser(signUpRequest);
-            TaiKhoan taiKhoan = taiKhoanRepository.findTaiKhoanByUsername(googlePojo.getEmail());
+            TaiKhoan taiKhoan = new TaiKhoan();
             taiKhoan.setProvider(Provider.GOOGLE);
-            taiKhoan.setTrangThaiHoatDong(TrangThai.INACTIVE);
-            taiKhoan = taiKhoanRepository.save(taiKhoan);
-            taiKhoan.setPassword(PASS_GOOGLE_ACCOUNT);
+            taiKhoan.setUsername(googlePojo.getId() + googlePojo.getEmail());
+            taiKhoan.setVerifyEmail(true);
+            taiKhoan.setPassword(passwordEncoder.encode(PASS_GOOGLE_ACCOUNT + googlePojo.getEmail()));
+            taiKhoan.setRole(Role.USER);
+            taiKhoan.setTrangThaiHoatDong(TrangThai.ACTIVE);
+            User user = new User();
+            user.setPicture(googlePojo.getPicture());
+            user.setEmail(googlePojo.getEmail());
+            user.setHoTen(googlePojo.getFamily_name() + " " + googlePojo.getName());
+            userRepository.save(user);
+            user = userRepository.findUserByEmail(googlePojo.getEmail());
+            taiKhoan.setUser(user);
+            taiKhoanRepository.save(taiKhoan);
             return new CustomTaiKhoanDetails(taiKhoan);
         } else  {
-            TaiKhoan taiKhoan = new TaiKhoan(googlePojo.getEmail(), PASS_GOOGLE_ACCOUNT, Role.USER, Provider.GOOGLE, taiKhoanRepository.findTaiKhoanByUser_Email(googlePojo.getEmail()).getTrangThaiHoatDong());
+            TaiKhoan taiKhoan = taiKhoanRepository.findTaiKhoanByUser_Email(googlePojo.getEmail());
             return new CustomTaiKhoanDetails(taiKhoan);
         }
     }

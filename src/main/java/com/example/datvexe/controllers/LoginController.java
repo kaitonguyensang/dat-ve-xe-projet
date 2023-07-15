@@ -1,9 +1,6 @@
 package com.example.datvexe.controllers;
 
-import com.example.datvexe.common.CommonApiService;
-import com.example.datvexe.common.GooglePojo;
-import com.example.datvexe.common.Provider;
-import com.example.datvexe.common.Role;
+import com.example.datvexe.common.*;
 import com.example.datvexe.config.CustomTaiKhoanDetails;
 import com.example.datvexe.constants.Constants;
 import com.example.datvexe.handler.CustomException;
@@ -69,33 +66,26 @@ public class LoginController {
     private GoogleUtils googleUtils;
 
     @GetMapping("/login-google")
-    public DataResponse loginGoogle(HttpServletRequest request) throws ClientProtocolException, IOException {
-        String code = request.getParameter("code");
-
-        if (code == null || code.isEmpty()) {
-            return new DataResponse("404", NOT_FOUND);
-        }
-
-        String accessToken = googleUtils.getToken(code);
-
+    public DataResponse loginGoogle(@RequestParam String accessToken) throws ClientProtocolException, IOException {
         GooglePojo googlePojo = googleUtils.getUserInfo(accessToken);
         CustomTaiKhoanDetails userDetail = googleUtils.buildUser(googlePojo);
         if (userDetail == null) {
             return new DataResponse("400", EXIST_EMAIL);
         }
-        TaiKhoan taiKhoan = taiKhoanRepository.findTaiKhoanByUser_Email(googlePojo.getEmail());
-        Long id = userRepository.findUserByEmail(googlePojo.getEmail()).getId();
-        LoginResponse loginResponse = new LoginResponse(null, Role.USER, id, taiKhoan.getUsername(), googlePojo.getEmail());
-        if (!userDetail.isEnabled()) {
-            return new DataResponse("201", loginResponse);
-        }
         // Xác thực từ username và password.
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         userDetail.getUsername(),
-                        userDetail.getPassword()
+                        PASS_GOOGLE_ACCOUNT + googlePojo.getEmail()
                 )
         );
+        TaiKhoan taiKhoan = taiKhoanRepository.findTaiKhoanByUser_Email(googlePojo.getEmail());
+        Long id = taiKhoan.getUser().getId();
+
+        LoginResponse loginResponse = new LoginResponse(null, Role.USER, id, taiKhoan.getUsername(), googlePojo.getEmail());
+        if (!taiKhoan.getVerifyEmail()) {
+            return new DataResponse("201", loginResponse);
+        }
 
         // Nếu không xảy ra exception tức là thông tin hợp lệ
         // Set thông tin authentication vào Security Context
@@ -140,6 +130,10 @@ public class LoginController {
             email = taiKhoan.getUser().getEmail();
         }
 
+        if (!taiKhoan.getVerifyEmail()) {
+            return new DataResponse("201", new LoginResponse(null,taiKhoan.getRole(), id, taiKhoan.getUsername(), email));
+        }
+
         // Trả về jwt cho người dùng.
         String jwt = tokenProvider.generateToken((CustomTaiKhoanDetails) authentication.getPrincipal());
 
@@ -162,6 +156,7 @@ public class LoginController {
                 }
             }
         }
+
         String email;
         if (Role.ADMIN.equals(taiKhoan.getRole())) {
             email = taiKhoan.getAdmin().getEmail();
@@ -177,7 +172,7 @@ public class LoginController {
         taiKhoanRepository.save(taiKhoan);
 
         //send email
-        commonApiService.sendEmail(email,"OTP: "+otp, "Reset password",false);
+        commonApiService.sendEmail(email, "This is OTP of account: " + taiKhoan.getUsername() + "\n" + "OTP: "+otp , "Reset password",false);
 
         ForgetPasswordDto forgetPasswordDto = new ForgetPasswordDto();
         String hash = AESUtils.encrypt (taiKhoan.getId()+";"+otp, true);
@@ -204,6 +199,8 @@ public class LoginController {
         }
 
         if(taiKhoan.getAttemptCode() >= Constants.MAX_ATTEMPT_FORGET_PWD){
+            taiKhoan.setTrangThaiHoatDong(TrangThai.INACTIVE);
+            taiKhoanRepository.save(taiKhoan);
             throw new CustomException("400", "Account locked");
         }
 

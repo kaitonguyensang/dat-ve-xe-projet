@@ -31,7 +31,7 @@ public class Admin {
     @Column(name = "email")
     private String email;
 
-    @OneToOne
+    @OneToOne(mappedBy ="admin")
     @JoinColumn(name = "taikhoan_id", referencedColumnName = "id")
     @JsonManagedReference
     private TaiKhoan taiKhoan;

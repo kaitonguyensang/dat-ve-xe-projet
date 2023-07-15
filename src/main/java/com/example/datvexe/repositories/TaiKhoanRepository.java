@@ -1,5 +1,6 @@
 package com.example.datvexe.repositories;
 import com.example.datvexe.models.TaiKhoan;
+import com.example.datvexe.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -7,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, Long> {
-
+    TaiKhoan findTaiKhoanByUser(User user);
     TaiKhoan findTaiKhoanByNhaXe_Email(String email);
     TaiKhoan findTaiKhoanById(Long id);
     List<TaiKhoan> findAll();

@@ -15,4 +15,5 @@ public class RequestForgetPasswordForm {
     @Email
     @ApiModelProperty(name = "email", required = true)
     private String email;
+
 }

@@ -4,6 +4,7 @@ import org.hibernate.engine.config.spi.ConfigurationService;
 
 public class Constants {
     public static final Integer MAX_ATTEMPT_FORGET_PWD = 5;
+    public static final Integer MAX_ATTEMPT_VERIFY_EMAIL = 5;
     public static final Integer MAX_TIME_FORGET_PWD = 5 * 60 * 1000; //5 minutes
     public static final String NO_ANY_ACCOUNT = "Not find any account.";
     public static final String NO_ANY_BUS_STATION = "Not find any bus station.";

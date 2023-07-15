@@ -40,6 +40,21 @@ public class TaiKhoan {
     @Enumerated(EnumType.STRING)
     private TrangThai trangThaiHoatDong;
 
+    @Column(name = "verifyemail")
+    private Boolean verifyEmail;
+
+    @JsonIgnore
+    @Column(name = "verify_email_time")
+    private Date verifyEmailTime;
+
+    @JsonIgnore
+    @Column(name="verify_email_code")
+    private String verifyEmailCode;
+
+    @JsonIgnore
+    @Column(name = "attempt_verify_email")
+    private Integer attemptVerifyEmail;
+
     @JsonIgnore
     @Column(name="reset_pwd_code")
     private String resetPwdCode;
@@ -52,15 +67,15 @@ public class TaiKhoan {
     @Column(name = "attempt_forget_pwd")
     private Integer attemptCode;
 
-    @OneToOne(mappedBy ="taiKhoan")
+    @OneToOne
     @JsonBackReference
     private Admin admin;
 
-    @OneToOne(mappedBy ="taiKhoan")
+    @OneToOne
     @JsonBackReference
     private User user;
 
-    @OneToOne(mappedBy ="taiKhoan")
+    @OneToOne
     @JsonBackReference
     private NhaXe nhaXe;
 
