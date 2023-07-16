@@ -31,6 +31,9 @@ public class VeXe {
     @Column(name = "ngaynhan")
     private LocalDate ngayNhan;
 
+    @Column(name = "ma_thanh_toan")
+    private String maThanhToan;
+
     @ManyToOne
     @JoinColumn(name = "tuyenxe_id",referencedColumnName = "id")
     @JsonManagedReference

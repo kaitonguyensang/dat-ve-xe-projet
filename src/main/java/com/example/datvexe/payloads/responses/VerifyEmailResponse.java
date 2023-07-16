@@ -15,4 +15,10 @@ public class VerifyEmailResponse {
     @NotEmpty(message = "Email can not be null.")
     @ApiModelProperty(name = "idHash", required = true)
     private String idHash;
+
+    @ApiModelProperty(name = "username", required = true)
+    private String username;
+
+    @ApiModelProperty(name = "password", required = true)
+    private String password;
 }

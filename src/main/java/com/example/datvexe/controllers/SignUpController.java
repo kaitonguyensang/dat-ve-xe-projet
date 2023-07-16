@@ -49,7 +49,7 @@ public class SignUpController {
     private TaiKhoanRepository taiKhoanRepository;
 
     @PostMapping("/add")
-    public DataResponse addTaiKhoan(@RequestBody SignUpRequest signUpRequest, HttpSession httpSession){
+    public DataResponse addTaiKhoan(@RequestBody SignUpRequest signUpRequest){
         int check = 0;
         TaiKhoan taiKhoan = new TaiKhoan();
         if (signUpRequest.getRole() == Role.USER){
@@ -88,18 +88,14 @@ public class SignUpController {
 
         commonApiService.sendEmail(signUpRequest.getEmail(), "This is OTP of account: " + taiKhoan.getUsername() + "\n" + "OTP: "+otp , "Reset password",false);
 
-        ForgetPasswordDto forgetPasswordDto = new ForgetPasswordDto();
         String hash = AESUtils.encrypt (taiKhoan.getId()+";"+otp, true);
 
-        httpSession.setAttribute("username-" + taiKhoan.getId(), signUpRequest.getUsername());
-        httpSession.setAttribute("password-" + taiKhoan.getId(), signUpRequest.getPassword());
-        httpSession.setAttribute("email-" + taiKhoan.getId(), signUpRequest.getEmail());
 
         return new DataResponse("200",hash);
     }
 
     @PostMapping("/verify-email")
-    public DataResponse xacthucEmail(@RequestBody VerifyEmailResponse verifyEmailResponse, HttpSession httpSession) {
+    public DataResponse xacthucEmail(@RequestBody VerifyEmailResponse verifyEmailResponse) {
         if(verifyEmailResponse == null) throw new CustomException("404", "Missing field!!!");
 
 
@@ -116,9 +112,6 @@ public class SignUpController {
         }
 
         if(taiKhoan.getAttemptVerifyEmail() >= Constants.MAX_ATTEMPT_VERIFY_EMAIL){
-            httpSession.removeAttribute("username-" + taiKhoan.getId());
-            httpSession.removeAttribute("password-" + taiKhoan.getId());
-            httpSession.removeAttribute("email-" + taiKhoan.getId());
             taiKhoan.setResetPwdTime(null);
             taiKhoan.setResetPwdCode(null);
             taiKhoan.setAttemptCode(null);
@@ -144,14 +137,12 @@ public class SignUpController {
 
         TaiKhoan taiKhoan1 = taiKhoanRepository.findTaiKhoanById(id);
 
-        String username = String.valueOf(httpSession.getAttribute("username-" + taiKhoan.getId()));
-        String password = String.valueOf(httpSession.getAttribute("password-" + taiKhoan.getId()));
 
         // Xác thực từ username và password.
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        username,
-                        password
+                        verifyEmailResponse.getUsername(),
+                        verifyEmailResponse.getPassword()
                 )
         );
 
@@ -160,7 +151,7 @@ public class SignUpController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Long idAcount = 0L;
         String email;
-        TaiKhoan taiKhoanAcount = taiKhoanRepository.findTaiKhoanByUsername(username);
+        TaiKhoan taiKhoanAcount = taiKhoanRepository.findTaiKhoanByUsername(verifyEmailResponse.getUsername());
         if (taiKhoanAcount.getRole() == Role.NHAXE) {
             id = taiKhoanAcount.getNhaXe().getId();
             email = taiKhoanAcount.getNhaXe().getEmail();

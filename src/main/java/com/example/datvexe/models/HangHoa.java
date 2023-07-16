@@ -36,6 +36,9 @@ public class HangHoa {
     @Column(name = "ngaydat")
     private LocalDate ngayDat;
 
+    @Column(name = "ma_thanh_toan")
+    private String maThanhToan;
+
     @Column(name = "trangthai")
     @Enumerated(EnumType.STRING)
     private TrangThai trangThai;

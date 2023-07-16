@@ -1,7 +1,5 @@
 package com.example.datvexe.models;
 
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
@@ -35,6 +33,9 @@ public class NhaXe {
 
     @Column(name = "diachi")
     private String diaChi;
+
+    @Column(name = "ma_thanh_toan")
+    private String maThanhToan;
 
     @Column(name = "ngayhethan")
     private LocalDate ngayHetHan;
