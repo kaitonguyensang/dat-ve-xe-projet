@@ -45,37 +45,34 @@ public class SignUpServiceImpl implements SignUpService {
         return taiKhoan;
     }
 
-    public User convertSignUpToUser(SignUpRequest signUpRequest, TaiKhoan taiKhoan) {
+    public User convertSignUpToUser(SignUpRequest signUpRequest) {
         User user = new User();
         user.setHoTen(signUpRequest.getHoTen());
         user.setCmnd(signUpRequest.getCmnd());
         user.setSdt(signUpRequest.getSdt());
         user.setEmail(signUpRequest.getEmail());
         user.setDiaChi(signUpRequest.getDiaChi());
-        user.setTaiKhoan(taiKhoan);
         user.setPicture(signUpRequest.getPicture());
         return user;
     }
 
-    public NhaXe convertSignUpToNhaXe(SignUpRequest signUpRequest, TaiKhoan taiKhoan){
+    public NhaXe convertSignUpToNhaXe(SignUpRequest signUpRequest){
         NhaXe nhaXe = new NhaXe();
         nhaXe.setTenNhaXe(signUpRequest.getTenNhaXe());
         nhaXe.setSdt(signUpRequest.getSdt());
         nhaXe.setMoTaNgan(signUpRequest.getMoTaNgan());
         nhaXe.setEmail(signUpRequest.getEmail());
         nhaXe.setDiaChi(signUpRequest.getDiaChi());
-        nhaXe.setTaiKhoan(taiKhoan);
         nhaXe.setPicture(signUpRequest.getPicture());
         return nhaXe;
     }
 
-    public Admin convertSignUpToAdmin(SignUpRequest signUpRequest, TaiKhoan taiKhoan){
+    public Admin convertSignUpToAdmin(SignUpRequest signUpRequest){
         Admin admin = new Admin();
         admin.setName(signUpRequest.getName());
         admin.setEmail(signUpRequest.getEmail());
         admin.setSdt(signUpRequest.getSdt());
         admin.setCmnd(signUpRequest.getCmnd());
-        admin.setTaiKhoan(taiKhoan);
         return admin;
     }
 
@@ -115,15 +112,12 @@ public class SignUpServiceImpl implements SignUpService {
         TaiKhoan taiKhoanNew = convertSignUpToTaiKhoan(signUpRequest);
         String password = passwordEncoder.encode(signUpRequest.getPassword());
         taiKhoanNew.setPassword(password);
-        TaiKhoan taiKhoanAdd = taiKhoanRepository.save(taiKhoanNew);
-        TaiKhoan taiKhoanOfUsername = new TaiKhoan();
-        if(taiKhoanAdd != null)  {
-            taiKhoanOfUsername = taiKhoanRepository.findTaiKhoanByUsername(taiKhoanAdd.getUsername());
-        }
-        User userNew = convertSignUpToUser(signUpRequest, taiKhoanOfUsername);
-        User userAdd = userRepository.save(userNew);
-        if (userAdd != null) return 5;
-        else return 6;
+        User userNew = convertSignUpToUser(signUpRequest);
+        userRepository.save(userNew);
+        User userMap = userRepository.findUserByEmail(signUpRequest.getEmail());
+        taiKhoanNew.setUser(userMap);
+        taiKhoanRepository.save(taiKhoanNew);
+        return 5;
     }
 
     public int addTaiKhoanNhaXe(SignUpRequest signUpRequest){
@@ -136,9 +130,11 @@ public class SignUpServiceImpl implements SignUpService {
         TaiKhoan taiKhoanNew= convertSignUpToTaiKhoan(signUpRequest);
         String password = passwordEncoder.encode(signUpRequest.getPassword());
         taiKhoanNew.setPassword(password);
-        TaiKhoan taiKhoanAdd = taiKhoanRepository.save(taiKhoanNew);
-        NhaXe nhaXeNew = convertSignUpToNhaXe(signUpRequest,taiKhoanAdd);
+        NhaXe nhaXeNew = convertSignUpToNhaXe(signUpRequest);
         nhaXeRepository.save(nhaXeNew);
+        NhaXe nhaXeMap = nhaXeRepository.findNhaXesByEmail(signUpRequest.getEmail());
+        taiKhoanNew.setNhaXe(nhaXeMap);
+        taiKhoanRepository.save(taiKhoanNew);
         return 5;
     }
     public int addTaiKhoanAdmin(SignUpRequest signUpRequest) {
@@ -147,17 +143,15 @@ public class SignUpServiceImpl implements SignUpService {
         if (check != 5) return check;
 
         TaiKhoan taiKhoanNew = convertSignUpToTaiKhoan(signUpRequest);
+        taiKhoanNew.setVerifyEmail(true);
         String password = passwordEncoder.encode(signUpRequest.getPassword());
         taiKhoanNew.setPassword(password);
-        TaiKhoan taiKhoanAdd = taiKhoanRepository.save(taiKhoanNew);
-        TaiKhoan taiKhoanOfAdmin = new TaiKhoan();
-        if (taiKhoanAdd != null) {
-            taiKhoanOfAdmin = taiKhoanRepository.findTaiKhoanByUsername(taiKhoanAdd.getUsername());
-        }
-        Admin adminnew = convertSignUpToAdmin(signUpRequest, taiKhoanOfAdmin);
-        Admin adminAdd = adminRepository.save(adminnew);
-        if (adminAdd != null) return 5;
-        else return 6;
+        Admin adminnew = convertSignUpToAdmin(signUpRequest);
+        adminRepository.save(adminnew);
+        Admin adminMap = adminRepository.findAdminByCmnd(adminnew.getCmnd());
+        taiKhoanNew.setAdmin(adminMap);
+        taiKhoanRepository.save(taiKhoanNew);
+        return 5;
     }
 
 

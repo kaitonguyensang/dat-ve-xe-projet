@@ -3,6 +3,7 @@ package com.example.datvexe.controllers;
 import com.example.datvexe.common.CommonApiService;
 import com.example.datvexe.common.Provider;
 import com.example.datvexe.common.Role;
+import com.example.datvexe.common.TrangThai;
 import com.example.datvexe.config.CustomTaiKhoanDetails;
 import com.example.datvexe.config.JwtTokenProvider;
 import com.example.datvexe.constants.Constants;
@@ -90,9 +91,9 @@ public class SignUpController {
         ForgetPasswordDto forgetPasswordDto = new ForgetPasswordDto();
         String hash = AESUtils.encrypt (taiKhoan.getId()+";"+otp, true);
 
-        httpSession.setAttribute("username", signUpRequest.getUsername());
-        httpSession.setAttribute("password", signUpRequest.getPassword());
-        httpSession.setAttribute("email", signUpRequest.getEmail());
+        httpSession.setAttribute("username-" + taiKhoan.getId(), signUpRequest.getUsername());
+        httpSession.setAttribute("password-" + taiKhoan.getId(), signUpRequest.getPassword());
+        httpSession.setAttribute("email-" + taiKhoan.getId(), signUpRequest.getEmail());
 
         return new DataResponse("200",hash);
     }
@@ -115,12 +116,14 @@ public class SignUpController {
         }
 
         if(taiKhoan.getAttemptVerifyEmail() >= Constants.MAX_ATTEMPT_VERIFY_EMAIL){
-            httpSession.removeAttribute("username");
-            httpSession.removeAttribute("password");
-            httpSession.removeAttribute("email");
+            httpSession.removeAttribute("username-" + taiKhoan.getId());
+            httpSession.removeAttribute("password-" + taiKhoan.getId());
+            httpSession.removeAttribute("email-" + taiKhoan.getId());
             taiKhoan.setResetPwdTime(null);
             taiKhoan.setResetPwdCode(null);
             taiKhoan.setAttemptCode(null);
+            taiKhoan.setTrangThaiHoatDong(TrangThai.INACTIVE);
+            taiKhoanRepository.save(taiKhoan);
             throw new CustomException("400", "Account locked");
         }
 
@@ -139,8 +142,10 @@ public class SignUpController {
         taiKhoan.setVerifyEmail(true);
         taiKhoanRepository.save(taiKhoan);
 
-        String username = String.valueOf(httpSession.getAttribute("username"));
-        String password = String.valueOf(httpSession.getAttribute("password"));
+        TaiKhoan taiKhoan1 = taiKhoanRepository.findTaiKhoanById(id);
+
+        String username = String.valueOf(httpSession.getAttribute("username-" + taiKhoan.getId()));
+        String password = String.valueOf(httpSession.getAttribute("password-" + taiKhoan.getId()));
 
         // Xác thực từ username và password.
         Authentication authentication = authenticationManager.authenticate(

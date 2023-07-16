@@ -32,7 +32,6 @@ public class Admin {
     private String email;
 
     @OneToOne(mappedBy ="admin")
-    @JoinColumn(name = "taikhoan_id", referencedColumnName = "id")
     @JsonManagedReference
     private TaiKhoan taiKhoan;
 }

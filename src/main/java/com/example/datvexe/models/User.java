@@ -39,7 +39,6 @@ public class User {
     private String picture;
 
     @OneToOne(mappedBy ="user")
-    @JoinColumn(name = "taikhoan_id",referencedColumnName = "id")
     @JsonManagedReference
     private TaiKhoan taiKhoan;
 

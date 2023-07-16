@@ -14,9 +14,9 @@ public interface SignUpService {
     int addTaiKhoanNhaXe(SignUpRequest signUpRequest);
     int addTaiKhoanAdmin(SignUpRequest signUpRequest);
     int checkInfo(SignUpRequest signUpRequest);
-    Admin convertSignUpToAdmin(SignUpRequest signUpRequest, TaiKhoan taiKhoan);
-    NhaXe convertSignUpToNhaXe(SignUpRequest signUpRequest, TaiKhoan taiKhoan);
-    User convertSignUpToUser(SignUpRequest signUpRequest, TaiKhoan taiKhoan);
+    Admin convertSignUpToAdmin(SignUpRequest signUpRequest);
+    NhaXe convertSignUpToNhaXe(SignUpRequest signUpRequest);
+    User convertSignUpToUser(SignUpRequest signUpRequest);
     TaiKhoan convertSignUpToTaiKhoan(SignUpRequest signUpRequest);
 
 }

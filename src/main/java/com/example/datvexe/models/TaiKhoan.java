@@ -69,14 +69,17 @@ public class TaiKhoan {
 
     @OneToOne
     @JsonBackReference
+    @JoinColumn(name = "admin_id",referencedColumnName = "id")
     private Admin admin;
 
     @OneToOne
     @JsonBackReference
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
 
     @OneToOne
     @JsonBackReference
+    @JoinColumn(name = "nhaXe_id",referencedColumnName = "id")
     private NhaXe nhaXe;
 
     public TaiKhoan() {

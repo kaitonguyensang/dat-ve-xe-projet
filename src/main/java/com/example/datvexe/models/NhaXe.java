@@ -42,8 +42,7 @@ public class NhaXe {
     @Column(name = "picture")
     private String picture;
 
-    @OneToOne(mappedBy = "nhaXe")
-    @JoinColumn(name = "taikhoan_id",referencedColumnName = "id")
+    @OneToOne(mappedBy ="nhaXe")
     @JsonManagedReference
     private TaiKhoan taiKhoan;
 

@@ -59,6 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/forget-password").permitAll()
                 .antMatchers("/api/tuyenxe/all").permitAll()
                 .antMatchers("/api/signup/add").permitAll()
+                .antMatchers("/api/signup/verify-email").permitAll()
                 .antMatchers("/api/tuyenxe/find-by-address-date").permitAll()
                 .antMatchers("/api/tuyenxe/find-by-address").permitAll()
                 .antMatchers("/api/benxe/benxeid/**").permitAll()
