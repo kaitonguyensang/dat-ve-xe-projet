@@ -102,7 +102,7 @@ public class SignUpController {
 
         String[] hashGenerate = AESUtils.decrypt(verifyEmailResponse.getIdHash(),true).split(";",2);
         Long id = ConvertUtils.convertStringToLong(hashGenerate[0]);
-        if(Objects.equals(id,0)){
+        if(Objects.equals(id,0L)){
             throw new CustomException("400", "Wrong hash");
         }
 

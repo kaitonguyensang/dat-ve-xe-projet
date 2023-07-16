@@ -4,11 +4,17 @@ import com.example.datvexe.common.*;
 import com.example.datvexe.config.CustomTaiKhoanDetails;
 import com.example.datvexe.constants.Constants;
 import com.example.datvexe.handler.CustomException;
+import com.example.datvexe.models.Admin;
+import com.example.datvexe.models.NhaXe;
+import com.example.datvexe.models.User;
 import com.example.datvexe.payloads.dto.ApiMessageDto;
 import com.example.datvexe.payloads.dto.ForgetPasswordDto;
+import com.example.datvexe.payloads.requests.AccountGGUpdateRequest;
 import com.example.datvexe.payloads.requests.ForgetPasswordForm;
 import com.example.datvexe.payloads.requests.RequestForgetPasswordForm;
 import com.example.datvexe.payloads.responses.DataResponse;
+import com.example.datvexe.repositories.AdminRepository;
+import com.example.datvexe.repositories.NhaXeRepository;
 import com.example.datvexe.repositories.UserRepository;
 import com.example.datvexe.utils.AESUtils;
 import com.example.datvexe.utils.ConvertUtils;
@@ -31,7 +37,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.Validation;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 
@@ -41,8 +49,6 @@ import static com.example.datvexe.constants.Constants.*;
 @RequestMapping("/api")
 @CrossOrigin(origins = {"http://localhost:3000", "https://duyvotruong.github.io"})
 public class LoginController {
-
-    private static final long serialVersionUID = 1L;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -58,6 +64,12 @@ public class LoginController {
 
     @Autowired
     TaiKhoanRepository taiKhoanRepository;
+
+    @Autowired
+    NhaXeRepository nhaXeRepository;
+
+    @Autowired
+    AdminRepository adminRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -82,19 +94,54 @@ public class LoginController {
         TaiKhoan taiKhoan = taiKhoanRepository.findTaiKhoanByUser_Email(googlePojo.getEmail());
         Long id = taiKhoan.getUser().getId();
 
-        LoginResponse loginResponse = new LoginResponse(null, Role.USER, id, taiKhoan.getUsername(), googlePojo.getEmail());
-        if (!taiKhoan.getVerifyEmail()) {
-            return new DataResponse("201", loginResponse);
-        }
-
         // Nếu không xảy ra exception tức là thông tin hợp lệ
         // Set thông tin authentication vào Security Context
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         // Trả về jwt cho người dùng.
         String jwt = tokenProvider.generateToken((CustomTaiKhoanDetails) authentication.getPrincipal());
-        loginResponse = new LoginResponse(jwt, Role.USER, id, taiKhoan.getUsername(), googlePojo.getEmail());
+
+        LoginResponse loginResponse = new LoginResponse(jwt, Role.USER, id, taiKhoan.getUsername(), googlePojo.getEmail());
+
+        if (taiKhoan.getUser().getCmnd() == null || taiKhoan.getUser().getSdt() == null || taiKhoan.getUser().getDiaChi() == null) {
+            return new DataResponse("201", loginResponse);
+        }
+
         return new DataResponse("200", loginResponse);
+    }
+
+    @PostMapping("/login-google/update")
+    public DataResponse updateAccountLoginGG(@RequestBody AccountGGUpdateRequest accountGGUpdateRequest) {
+        User user = userRepository.findUserById(accountGGUpdateRequest.getId());
+
+        String cmnd = accountGGUpdateRequest.getCmnd();
+        String sdt = accountGGUpdateRequest.getSdt();
+
+        CustomException customExceptionCmnd = new CustomException("409", "Identity card has existed");
+        CustomException customExceptionSdt = new CustomException("409", "Phone number has existed");
+
+        //User
+        User userold = userRepository.findUserByCmnd(cmnd);
+        if(userold != null) throw customExceptionCmnd;
+        userold = userRepository.findUserBySdt(sdt);
+        if(userold != null) throw customExceptionSdt;
+
+        //NhaXe
+        NhaXe nhaXe = nhaXeRepository.findNhaXeBySdt(sdt);
+        if(nhaXe != null) throw customExceptionSdt;
+
+        //Admin
+        Admin admin = adminRepository.findAdminByCmnd(cmnd);
+        if(admin != null) throw customExceptionCmnd;
+        admin = adminRepository.findAdminBySdt(sdt);
+        if(admin != null) throw customExceptionSdt;
+
+        user.setSdt(accountGGUpdateRequest.getSdt());
+        user.setCmnd(accountGGUpdateRequest.getCmnd());
+        user.setDiaChi(accountGGUpdateRequest.getDiaChi());
+
+
+        userRepository.save(user);
+        return new DataResponse("200", "Successfull! Add information for account.");
     }
 
     @PostMapping("/login")
@@ -136,6 +183,17 @@ public class LoginController {
 
         // Trả về jwt cho người dùng.
         String jwt = tokenProvider.generateToken((CustomTaiKhoanDetails) authentication.getPrincipal());
+
+        if (taiKhoan.getRole() == Role.NHAXE) {
+            NhaXe nhaXe = nhaXeRepository.findNhaXeById(taiKhoan.getNhaXe().getId());
+            if (nhaXe.getNgayHetHan() == null) {
+                nhaXe.setNgayHetHan(LocalDate.now().plusDays(-1));
+                nhaXeRepository.save(nhaXe);
+                return new DataResponse("204", new LoginResponse(jwt,taiKhoan.getRole(), id, taiKhoan.getUsername(), email));
+            } else if (nhaXe.getNgayHetHan().isBefore(LocalDate.now())) {
+                return new DataResponse("204", new LoginResponse(jwt,taiKhoan.getRole(), id, taiKhoan.getUsername(), email));
+            }
+        }
 
         return new DataResponse("200", new LoginResponse(jwt,taiKhoan.getRole(), id, taiKhoan.getUsername(), email));
     }
@@ -189,7 +247,7 @@ public class LoginController {
 
         String[] hash = AESUtils.decrypt(forgetForm.getIdHash(),true).split(";",2);
         Long id = ConvertUtils.convertStringToLong(hash[0]);
-        if(Objects.equals(id,0)){
+        if(Objects.equals(id,0L)){
             throw new CustomException("400", "Wrong hash");
         }
 

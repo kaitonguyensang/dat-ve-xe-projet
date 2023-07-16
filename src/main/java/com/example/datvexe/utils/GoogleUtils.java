@@ -89,6 +89,9 @@ public class GoogleUtils {
             return new CustomTaiKhoanDetails(taiKhoan);
         } else  {
             TaiKhoan taiKhoan = taiKhoanRepository.findTaiKhoanByUser_Email(googlePojo.getEmail());
+            if (!Provider.GOOGLE.equals(taiKhoan.getProvider())) {
+                return null;
+            }
             return new CustomTaiKhoanDetails(taiKhoan);
         }
     }

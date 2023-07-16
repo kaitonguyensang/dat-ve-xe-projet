@@ -15,4 +15,5 @@ public class NhaXeResponse {
     private String moTaNgan;
     private String diaChi;
     private Long taiKhoanId;
+    private String picture;
 }

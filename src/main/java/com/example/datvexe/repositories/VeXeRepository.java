@@ -12,12 +12,10 @@ import java.util.List;
 
 @Repository
 public interface VeXeRepository extends JpaRepository<VeXe, Long> {
+    List<VeXe> findVeXesByMaThanhToan(String maThanhToan);
     List<VeXe> getVeXeByUser(User user);
-
     VeXe findVeXeByTuyenXe_IdAndSoGhe(Long tuyenXeId, int soGhe);
-
     List<VeXe> findVeXeByTuyenXe(TuyenXe tuyenXe);
     VeXe findVeXeById(Long veXeId);
-
     List<VeXe> findVeXeByTrangThaiOrTrangThai(TrangThai trangThai1, TrangThai trangThai2);
 }

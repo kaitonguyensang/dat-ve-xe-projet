@@ -11,6 +11,7 @@ import java.util.ListIterator;
 
 @Repository
 public interface NhaXeRepository extends JpaRepository<NhaXe, Long> {
+    NhaXe findNhaXeByMaThanhToan(String maThanhToan);
     NhaXe findNhaXesByEmail(String email);
     NhaXe findNhaXeBySdt(String sdt);
     NhaXe findNhaXeByTenNhaXe(String tenNhaXe);
